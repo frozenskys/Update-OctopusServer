@@ -71,6 +71,19 @@ function Install-OctopusMsi {
   }
 }
 
+function Set-TrustAllCertsPolicy {
+Add-Type @"
+  using System.Net;
+  using System.Security.Cryptography.X509Certificates;
+  public class TrustAllCertsPolicy : ICertificatePolicy {
+    public bool CheckValidationResult(ServicePoint srvPoint, X509Certificate certificate, WebRequest request, int certificateProblem) {
+      return true;
+    }
+  }
+"@
+  [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+}
+
 function Get-CurrentOctopusVersion {
   param ($OctopusServerUri)  
   return ((Invoke-WebRequest "$($OctopusServerUri)api").Content | ConvertFrom-Json).Version
@@ -181,6 +194,7 @@ function Update-Octopus {
 	$OctopusServerUri = ($OctopusConfig."octopus-settings".set | Where-Object {$_.key -eq "Octopus.WebPortal.ListenPrefixes"})."#text"
 	$OctopusDatabaseConnectionString = ($OctopusConfig."octopus-settings".set | Where-Object {$_.key -eq "Octopus.Storage.ExternalDatabaseConnectionString"})."#text"
 	$backupDateStamp = Get-Date -format yyyyMMddHHmmss
+	Set-TrustAllCertsPolicy
 
 	$existingVersion = Get-CurrentOctopusVersion -OctopusServerUri $OctopusServerUri	
 	Write-Host "Upgrading from version $($existingVersion)..."
@@ -211,7 +225,7 @@ function Update-Octopus {
 	Install-OctopusMsi -MsiPath $OctopusMsiPath
 	Start-OctopusServices
 	
-  #The Octopus service takes a couple of seconds to start up
+	#The Octopus service takes a couple of seconds to start up
 	Start-Sleep -s 5
 	if(Get-IsOctopusInMaintenanceMode -OctopusServerUri $OctopusServerUri -OctopusApiKey $OctopusApiKey) {
 	  Set-OctopusInMaintenanceMode -OctopusServerUri $OctopusServerUri -OctopusApiKey $OctopusApiKey -MaintenanceMode "off" | Out-Null
