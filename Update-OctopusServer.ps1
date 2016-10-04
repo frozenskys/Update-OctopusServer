@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
 	Handy script to orchestrate the steps necessary to upgrade an Octopus Server
+	Version 1.0.1
 
 .DESCRIPTION
 	The Octopus team have published a recommended list of steps for upgrading an Octopus server.
@@ -30,7 +31,6 @@
 
 .PARAMETER Use64Bit
 	Downloads the 64 bit version of the Octopus Server installer. Not specifying this will default to the 32 bit version.
-
 
 .PARAMETER Help
 	Displays this help as an alternative to calling "Get-Help .\Update-OctopusServer.ps1"
@@ -185,6 +185,7 @@ function Update-Octopus {
 	
 	$ErrorActionPreference = "Stop"
 	pushd (Get-Location)
+	Write-Host "Running Update-OctopusServer (Version 1.0.1)..."
 	Write-Host "Reading configuration data..."
 	$ServerLocation = (Get-Item HKLM:\SOFTWARE\Octopus\OctopusServer | Get-Itemproperty -Name InstallLocation | Select InstallLocation).InstallLocation
 	$OctopusServerConfigPath = (Get-Item HKLM:\SOFTWARE\Octopus\OctopusServer\OctopusServer | Get-Itemproperty -Name ConfigurationFilePath | Select ConfigurationFilePath).ConfigurationFilePath

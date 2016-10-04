@@ -38,7 +38,11 @@ At a high level this script will:
 To get the Octopus MSI the script pulls the list of versions from the [Octopus previous releases page](https://octopus.com/downloads/previous) and substitutes the version in to a templated link, adding the -x64 segment if specified, which is then downloaded.
 
 ## History
-- 2016-09-30 - Initial Commit
+
+- Version 1.0.0 (2016-09-30) 
+  - Initial Commit
+- Version 1.0.1 (2016-10-04) 
+  - Fix for SSL issue when server uses a self signed certificate
 
 ## Known Issues
 - If the Internet Explorer initial setup has not been run MSI links may not be retrieved
